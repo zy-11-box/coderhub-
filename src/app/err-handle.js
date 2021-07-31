@@ -22,6 +22,10 @@ const errHandle = (err, ctx) => {
             status = 401
             message = "无效的token~"
             break
+        case errType.UNPERMISSION:
+            status = 401
+            message = "您没有权限~"
+            break
         default:
             status = 404
             message = "NOT FOUND"

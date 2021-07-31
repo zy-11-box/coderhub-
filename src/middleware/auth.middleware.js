@@ -1,7 +1,8 @@
 //对登录前进行数据验证
 const jwt = require('jsonwebtoken')
 const { PUBLIC_KEY } = require('../app/config')
-const service = require('../service/user.service')
+const userService = require('../service/user.service')
+const premissionService = require('../service/premission.service')
 const errType = require('../constans/errType')
 const md5password = require('../utils/password-handle')
 
@@ -14,7 +15,7 @@ const verifyLogin = async (ctx, next) => {
     }
 
     //2.用户未存在
-    const result = await service.getUser(username)
+    const result = await userService.getUser(username)
     // console.log(result);
     if (result.length == 0) {
         const err = new Error(errType.USER_DOES_EXISTS)
@@ -34,7 +35,7 @@ const verifyLogin = async (ctx, next) => {
     await next()
 }
 //验证token授权的中间件（很重要，之后的接口要用到）
-const verifyAuth = (ctx, next) => {
+const verifyAuth = async (ctx, next) => {
     console.log("验证授权middleware");
     let token = ctx.headers.authorization
     if (!token) {
@@ -46,14 +47,35 @@ const verifyAuth = (ctx, next) => {
         const result = jwt.verify(token, PUBLIC_KEY, {
             algorithms: ['RS256']
         })
-        ctx.body = result
+        ctx.user = result
+        await next()
     } catch (err) {
         const error = new Error(errType.UNAUTHORIZATION)
         return ctx.app.emit('error', error, ctx)
     }
 }
+const verifyPermission = async (ctx, next) => {
+    console.log("验证权限middleware");
+    try {
+        const { momentid } = ctx.params
+        const { id } = ctx.user
+        // console.log(id, momentid);
+        const ispremission = await premissionService.premissionMoment(id, momentid)
+        // console.log(ispremission);
+        if (!ispremission) {
+            throw new Error()
+        }
+        await next()
+    } catch (err) {
+        // console.log(err);
+        const error = new Error(errType.UNPERMISSION)
+        return ctx.app.emit('error', error, ctx)
+    }
+}
+
 
 module.exports = {
     verifyLogin,
-    verifyAuth
+    verifyAuth,
+    verifyPermission
 }
