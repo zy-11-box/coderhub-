@@ -57,10 +57,14 @@ const verifyAuth = async (ctx, next) => {
 const verifyPermission = async (ctx, next) => {
     console.log("验证权限middleware");
     try {
-        const { momentid } = ctx.params
+        let tableNameId = ctx.params
+        tableNameId = Object.keys(tableNameId)[0]
+        let tableName = tableNameId.replace('Id', '')
+        const tableName_id = ctx.params[tableNameId]
+        // console.log(tableNameId);
         const { id } = ctx.user
-        // console.log(id, momentid);
-        const ispremission = await premissionService.premissionMoment(id, momentid)
+
+        const ispremission = await premissionService.premissionTableName(tableName, id, tableName_id)
         // console.log(ispremission);
         if (!ispremission) {
             throw new Error()

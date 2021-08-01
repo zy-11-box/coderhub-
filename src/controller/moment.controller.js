@@ -12,7 +12,7 @@ class momentController {
         ctx.body = "添加成功"
     }
     getMoment = async (ctx, next) => {
-        const momentid = ctx.params.momentid
+        const momentid = ctx.params.momentId
         // console.log(id);
         const result = await selectMoment(momentid)
         ctx.body = result[0][0]
@@ -24,13 +24,13 @@ class momentController {
     }
     update = async (ctx, next) => {
         const { content } = ctx.request.body
-        const { momentid } = ctx.params
-        const result = await updateMoment(momentid, content)
+        const { momentId } = ctx.params
+        const result = await updateMoment(momentId, content)
         ctx.body = result
     }
     remove = async (ctx, next) => {
-        const { momentid } = ctx.params
-        const result = await removeMoment(momentid)
+        const { momentId } = ctx.params
+        const result = await removeMoment(momentId)
         ctx.body = result
     }
 }

@@ -1,9 +1,9 @@
 const connection = require('../app/database')
-const sqlStr = `SELECT
-        m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
-        JSON_OBJECT('user_id',u.id,'username',u.username) author
-        FROM moment m
-        LEFT JOIN users u ON m.user_id = u.id`
+// const sqlStr = `SELECT
+//         m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
+//         JSON_OBJECT('user_id',u.id,'username',u.username) author
+//         FROM moment m
+//         LEFT JOIN users u ON m.user_id = u.id`
 class momentService {
     createMoment(user_id, content) {
         console.log(user_id, content);
@@ -13,7 +13,11 @@ class momentService {
     }
     selectMoment(id) {
         const statement = `
-        ${sqlStr}
+        SELECT
+        m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
+        JSON_OBJECT('user_id',u.id,'username',u.username) author
+        FROM moment m
+        LEFT JOIN users u ON m.user_id = u.id
         WHERE m.id = ?
         `
         const result = connection.execute(statement, [id])
@@ -21,7 +25,12 @@ class momentService {
     }
     listMoment(size, offset) {
         const statement = `
-        ${sqlStr}
+        SELECT
+        m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
+        JSON_OBJECT('user_id',u.id,'username',u.username) author,
+        (SELECT COUNT(*) FROM comment WHERE comment.moment_id = m.id) commentCount
+        FROM moment m
+        LEFT JOIN users u ON m.user_id = u.id
         LIMIT ? OFFSET ?
         `
         const result = connection.execute(statement, [size, offset])
