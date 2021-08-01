@@ -15,9 +15,12 @@ class momentService {
         const statement = `
         SELECT
         m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
-        JSON_OBJECT('user_id',u.id,'username',u.username) author
+        JSON_OBJECT('user_id',u.id,'username',u.username) author,
+        JSON_ARRAYAGG(JSON_OBJECT('id',l.id,'name',l.name)) lables
         FROM moment m
         LEFT JOIN users u ON m.user_id = u.id
+        LEFT JOIN moment_lable ml ON m.id = ml.moment_id
+        LEFT JOIN lable l ON ml.lable_id = l.id
         WHERE m.id = ?
         `
         const result = connection.execute(statement, [id])
@@ -28,7 +31,8 @@ class momentService {
         SELECT
         m.id id,m.content content,m.createTime createTime,m.updateTime updateTime,
         JSON_OBJECT('user_id',u.id,'username',u.username) author,
-        (SELECT COUNT(*) FROM comment WHERE comment.moment_id = m.id) commentCount
+        (SELECT COUNT(*) FROM comment WHERE comment.moment_id = m.id) commentCount,
+        (SELECT COUNT(*) FROM moment_lable ml WHERE ml.moment_id = m.id) lableCount
         FROM moment m
         LEFT JOIN users u ON m.user_id = u.id
         LIMIT ? OFFSET ?
@@ -49,6 +53,20 @@ class momentService {
         `
         const result = await connection.execute(statement, [momentid])
         return result[0]
+    }
+    async addLablesMoment(lableId, momentId) {
+        const statement = `
+       INSERT INTO moment_lable (moment_id,lable_id) VALUES(?,?)
+        `
+        const result = await connection.execute(statement, [momentId, lableId])
+        return result[0]
+    }
+    async isExistsLanble(lableId, momentId) {
+        const statement = `
+        SELECT * FROM moment_lable WHERE moment_id = ? AND lable_id = ?
+        `
+        const result = await connection.execute(statement, [momentId, lableId])
+        return result[0].length == 0 ? false : true
     }
 }
 

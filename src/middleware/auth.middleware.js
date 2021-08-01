@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const { PUBLIC_KEY } = require('../app/config')
 const userService = require('../service/user.service')
 const premissionService = require('../service/premission.service')
+
 const errType = require('../constans/errType')
 const md5password = require('../utils/password-handle')
 
@@ -78,8 +79,9 @@ const verifyPermission = async (ctx, next) => {
 }
 
 
+
 module.exports = {
     verifyLogin,
     verifyAuth,
-    verifyPermission
+    verifyPermission,
 }

@@ -1,4 +1,4 @@
-const { createMoment, selectMoment, listMoment, updateMoment, removeMoment } = require('../service/moment.service')
+const { createMoment, selectMoment, listMoment, updateMoment, removeMoment, addLablesMoment, isExistsLanble } = require('../service/moment.service')
 class momentController {
     create = async (ctx, next) => {
         //1.获取请求数据
@@ -32,6 +32,19 @@ class momentController {
         const { momentId } = ctx.params
         const result = await removeMoment(momentId)
         ctx.body = result
+    }
+    addLables = async (ctx, next) => {
+        const { momentId } = ctx.params
+        // console.log(ctx.lables);
+        for (let lable of ctx.lables) {
+            const isExists = await isExistsLanble(lable.id, momentId)
+            // console.log(isExists);
+            if (!isExists) {
+                const result = await addLablesMoment(lable.id, momentId)
+                // console.log(result);
+            }
+        }
+        ctx.body = "添加标签成功"
     }
 }
 
