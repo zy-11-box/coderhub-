@@ -1,4 +1,8 @@
-const { createMoment, selectMoment, listMoment, updateMoment, removeMoment, addLablesMoment, isExistsLanble } = require('../service/moment.service')
+const path = require('path')
+const fs = require('fs')
+const { PATH_PICTURE } = require('../constans/errType')
+const { createMoment, selectMoment, listMoment, updateMoment, removeMoment, addLablesMoment, isExistsLanble, getFileInfo } = require('../service/moment.service')
+
 class momentController {
     create = async (ctx, next) => {
         //1.获取请求数据
@@ -45,6 +49,17 @@ class momentController {
             }
         }
         ctx.body = "添加标签成功"
+    }
+    async getMomentPicture(ctx, next) {
+        try {
+            const { filename } = ctx.params
+            const [result] = await getFileInfo(filename)
+            // console.log(result);
+            ctx.response.set('content-type', result.mimetype);
+            ctx.body = fs.createReadStream(`${PATH_PICTURE}/${filename}`)
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
 

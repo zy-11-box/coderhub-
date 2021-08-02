@@ -13,8 +13,22 @@ class UserService {
         const result = await connection.execute(statement, [username])
         return result[0]
     }
-
-
+    async getUserInfoService(id) {
+        const statement = `SELECT
+            u.id id,u.username username,u.createAt createAt,u.updateAt updateAt,u.avater_url avater_url,
+            JSON_ARRAYAGG(CONCAT(u.avater_url,'/',a.filename)) oldAvater_url
+            FROM users u
+            LEFT JOIN avater a ON u.id = a.user_id
+            WHERE u.id = ? AND a.old_new = 'old'
+            GROUP BY u.id`
+        const result = await connection.execute(statement, [id])
+        return result[0]
+    }
+    async getUserAvaterService(userId) {
+        const statement = `SELECT * FROM avater WHERE user_id = ? AND old_new = 'new'`
+        const result = await connection.execute(statement, [userId])
+        return result[0]
+    }
 }
 
 module.exports = new UserService()

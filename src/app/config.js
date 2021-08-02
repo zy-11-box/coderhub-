@@ -7,6 +7,7 @@ const PUBLIC_KEY = fs.readFileSync(path.resolve(__dirname, './keys/public.key'))
 
 module.exports = {
     APP_PORT,
+    APP_HOST,
     MYSQL_USER,
     MYSQL_PASSWORD,
     MYSQL_DATABASE,
